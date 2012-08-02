@@ -28,13 +28,13 @@ class ElasticSearch(object):
         setattr(model, name, ElasticSearchDescriptor(self))
 
     def get(self, pk):
-        return Resource(self.makepath(pk), wrapper=self.wrapresponse).get()
+        return Resource(self.makepath(pk)).get()
 
     def put(self, pk, instance):
-        return Resource(self.makepath(pk), wrapper=self.wrapresponse).put(data=instance)
+        return Resource(self.makepath(pk)).put(data=instance)
 
     def delete(self, pk):
-        return Resource(self.makepath(pk), wrapper=self.wrapresponse).delete()
+        return Resource(self.makepath(pk)).delete()
 
     def django_post_delete(self, sender, instance, **kwargs):
         from rubber.instanceutils import get_pk
@@ -51,12 +51,22 @@ class ElasticSearch(object):
         except AttributeError, e:
             if not name in ('search', 'mapping'):
                 raise e
-            setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=self.wrapresponse))
+            if name == 'search':
+                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=self.wrapresponse))
+            else:
+                setattr(self, name, Resource(self.makepath("_%s"%name)))
+
             return default_impl(name)
 
     def makepath(self, name):
-        if not name: name = ''
-        return "%s/%s/%s" % (self.index_name, self.type, name)
+        tokens = []
+        if self.index_name:
+            tokens.append(str(self.index_name))
+        if self.type:
+            tokens.append(str(self.type))
+        if name:
+            tokens.append(str(name))
+        return "/".join(tokens)
 
     def wrapresponse(self, resp):
         return Response(resp, hit_class=self.hit_class)

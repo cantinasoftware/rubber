@@ -104,7 +104,7 @@ try:
             Checks that when set on a django model, index_name and type are automatically set
             to the app_name / model_name
             """
-            self.assertEquals('rubber', self.Article.elasticsearch.index_name)
+            self.assertEquals('tests', self.Article.elasticsearch.index_name)
             self.assertEquals('article', self.Article.elasticsearch.type)
 
         def test_search(self):
@@ -119,16 +119,16 @@ try:
             self.Article.elasticsearch.search(q, toto='titi')
 
             self.assertEquals(1, len(requestmock.stack))
-            self.assertEquals('http://example.com:9200/rubber/article/_search', requestmock.stack[0]['url'])
+            self.assertEquals('http://example.com:9200/tests/article/_search', requestmock.stack[0]['url'])
             self.assertEquals('get', requestmock.stack[0]['method'])
             self.assertEquals('titi', requestmock.stack[0]['kwargs']['toto'])
-            from instanceutils import data_to_json
+            from rubber.instanceutils import data_to_json
             self.assertEquals(data_to_json(q), requestmock.stack[0]['kwargs']['data'])
 
             self.Article.elasticsearch.mapping.put({'some': 'mapping'}, toto='titi')
 
             self.assertEquals(2, len(requestmock.stack))
-            self.assertEquals('http://example.com:9200/rubber/article/_mapping', requestmock.stack[1]['url'])
+            self.assertEquals('http://example.com:9200/tests/article/_mapping', requestmock.stack[1]['url'])
             self.assertEquals('put', requestmock.stack[1]['method'])
             self.assertEquals('titi', requestmock.stack[1]['kwargs']['toto'])
 
@@ -157,7 +157,7 @@ try:
             self.assertIsNotNone(article.elasticsearch)
             from rubber.resource import InstanceResource
             self.assertTrue(isinstance(article.elasticsearch, InstanceResource))
-            self.assertEquals('rubber/article/123', article.elasticsearch.path)
+            self.assertEquals('tests/article/123', article.elasticsearch.path)
             
             from rubber import resource
             requestmock = RequestMock()
