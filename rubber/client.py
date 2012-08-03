@@ -1,5 +1,6 @@
 from rubber.resource import Resource
 from rubber.response import Hit, Response
+from rubber import settings
 
 class ElasticSearch(object):
     def __init__(self, index_name=None, type=None, auto_index=True, hit_class=Hit):
@@ -17,7 +18,7 @@ class ElasticSearch(object):
 
         self.model = model
 
-        if self.auto_index:
+        if self.auto_index and not getattr(settings, 'RUBBER_DISABLE_AUTO_INDEX', False):
             try:
                 from django.db.models.signals import post_save, post_delete
                 post_save.connect(self.django_post_save, sender=model)
