@@ -18,19 +18,27 @@ class Hit(object):
             return attributes.get("_%s"%name)
         return default_impl(name)
     
+import requests
 class Response(object):
-    def __init__(self, dict_response, hit_class=Hit):
-        self.took = dict_response.get('took')
-        self.timed_out = dict_response.get('timed_out')
-        self.hits = HitCollection(dict_response.get('hits'), hit_class=hit_class)
-        self.shards = Shard(dict_response.get('_shards'))
+    """
+    A HTTP response object that acts as a proxy on its provided requests.models.Response object
+    """
+    def __init__(self, response):
+        self._response = response
 
-class Shard(object):
-    def __init__(self, dict_response):
-        dict_response = dict_response or {}
-        self.total = dict_response.get('total')
-        self.successful = dict_response.get('successful')
-        self.failed = dict_response.get('failed')
+    def __getattribute__(self, attr):
+        if attr in ('_response', 'results'):
+            return super(Response, self).__getattribute__(attr)
+        return getattr(self._response, attr)
+
+class SearchResponse(Response):
+    def __init__(self, response, hit_class=Hit):
+        super(SearchResponse, self).__init__(response)
+
+        if self._response.json:
+            self.results = HitCollection(self._response.json.get('hits'), hit_class=hit_class)
+        else:
+            self.results = HitCollection({})
 
 class HitCollection(object):
     def __init__(self, dict_response, hit_class=Hit):

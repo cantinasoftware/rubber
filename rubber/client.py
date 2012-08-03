@@ -28,13 +28,13 @@ class ElasticSearch(object):
         setattr(model, name, ElasticSearchDescriptor(self))
 
     def get(self, pk):
-        return Resource(self.makepath(pk)).get()
+        return Resource(self.makepath(pk), wrapper=Response).get()
 
     def put(self, pk, instance):
-        return Resource(self.makepath(pk)).put(data=instance)
+        return Resource(self.makepath(pk), wrapper=Response).put(data=instance)
 
     def delete(self, pk):
-        return Resource(self.makepath(pk)).delete()
+        return Resource(self.makepath(pk), wrapper=Response).delete()
 
     def django_post_delete(self, sender, instance, **kwargs):
         from rubber.instanceutils import get_pk
@@ -52,9 +52,9 @@ class ElasticSearch(object):
             if not name in ('search', 'mapping'):
                 raise e
             if name == 'search':
-                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=self.wrapresponse))
+                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=self.wrapsearchresponse))
             else:
-                setattr(self, name, Resource(self.makepath("_%s"%name)))
+                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=Response))
 
             return default_impl(name)
 
@@ -68,8 +68,9 @@ class ElasticSearch(object):
             tokens.append(str(name))
         return "/".join(tokens)
 
-    def wrapresponse(self, resp):
-        return Response(resp, hit_class=self.hit_class)
+    def wrapsearchresponse(self, resp):
+        from rubber.response import SearchResponse
+        return SearchResponse(resp, hit_class=self.hit_class)
 
 class ElasticSearchDescriptor(object):
 
@@ -80,5 +81,5 @@ class ElasticSearchDescriptor(object):
         if instance != None:
             from rubber.resource import InstanceResource
             from rubber.instanceutils import get_pk
-            return InstanceResource(instance, self.elasticsearch.makepath(get_pk(instance)), wrapper=self.elasticsearch.wrapresponse)
+            return InstanceResource(instance, self.elasticsearch.makepath(get_pk(instance)), wrapper=self.elasticsearch.wrapsearchresponse)
         return self.elasticsearch

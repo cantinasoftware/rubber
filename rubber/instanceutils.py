@@ -1,5 +1,6 @@
+from requests.compat import json
+
 def data_to_json(data):
-    import json
 
     # convert dicts
     if isinstance(data, dict):
