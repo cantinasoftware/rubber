@@ -23,23 +23,23 @@ class Resource(object):
         return response
 
     def get(self, data=None, **kwargs):
-        if settings.RUBBER_MOCK_HTTP_RESPONSE:
-            return self.wrapper(ResponseMock(settings.RUBBER_MOCK_HTTP_RESPONSE))
+        mock = getattr(settings, 'RUBBER_MOCK_HTTP_RESPONSE', None)
+        if mock: return self.wrapper(ResponseMock(mock))
         return self.wrapper(requests.get(self.base_url + self.path, data=data_to_json(data), **kwargs))
 
     def put(self, data=None, **kwargs):
-        if settings.RUBBER_MOCK_HTTP_RESPONSE:
-            return self.wrapper(ResponseMock(settings.RUBBER_MOCK_HTTP_RESPONSE))
+        mock = getattr(settings, 'RUBBER_MOCK_HTTP_RESPONSE', None)
+        if mock: return self.wrapper(ResponseMock(mock))
         return self.wrapper(requests.put(self.base_url + self.path, data=data_to_json(data), **kwargs))
 
     def post(self, data=None, **kwargs):
-        if settings.RUBBER_MOCK_HTTP_RESPONSE:
-            return self.wrapper(ResponseMock(settings.RUBBER_MOCK_HTTP_RESPONSE))
+        mock = getattr(settings, 'RUBBER_MOCK_HTTP_RESPONSE', None)
+        if mock: return self.wrapper(ResponseMock(mock))
         return self.wrapper(requests.post(self.base_url + self.path, data=data_to_json(data), **kwargs))
 
     def delete(self, data=None, **kwargs):
-        if settings.RUBBER_MOCK_HTTP_RESPONSE:
-            return self.wrapper(ResponseMock(settings.RUBBER_MOCK_HTTP_RESPONSE))
+        mock = getattr(settings, 'RUBBER_MOCK_HTTP_RESPONSE', None)
+        if mock: return self.wrapper(ResponseMock(mock))
         return self.wrapper(requests.delete(self.base_url + self.path, data=data_to_json(data), **kwargs))
 
     def __call__(self, *args, **kwargs):

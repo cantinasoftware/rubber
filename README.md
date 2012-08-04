@@ -10,6 +10,8 @@ Its main features are:
     - automatically saves your models to Elasticsearch
     - provides a Manager-style object on your django models
       for querying
+  - rubber is unit-testing friendly: you don't need an
+    elasticsearch instance to run your tests
 
 Dependencies
 ============
@@ -54,6 +56,11 @@ You can GET/PUT/POST/DELETE on each endpoint like this:
     response = client.mapping.put(somedict)
     response = client.mapping.delete()
 
+All four methods (get/put/post/delete) are directly mapped on [their equivalent _requests_ method](http://docs.python-requests.org/en/latest/api/#requests.Request),
+this means that you can pass any additional parameter that the requests library accepts (files, headers, cookies, etc.).
+
+    response = client.search.get(params={"q":"*"})
+
 Each endpoint is callable and defaults to get(). That means that you can search like this:
 
     response = client.search() # Equivalent to client.search.get()
@@ -82,6 +89,21 @@ As a convenience, they also allow you to get '_' properties without the uderscor
     hit.source    # => the '_source' property of the JSON hit
     hit._source   # => the exact same thing
     hit.score     # => the '_score'
+
+### Advanced configuration
+
+Since rubber is based on the [requests library](http://python-requests.org), 
+you can configure every aspect of the HTTP request/response cycle directly
+through [_requests_ configuration options](http://docs.python-requests.org/en/latest/user/advanced/#configuring-requests).
+
+### Unit testing
+
+You probably want to be able to run unit tests without having Elasticsearch running.
+If that is the case, rubber has a configuration option that allows you to mock
+content returned by elasticsearch.
+
+Just set rubber.settings.RUBBER_MOCK_HTTP_RESPONSE to a string that should be the response body
+and you're set.
 
 Django integration
 ------------------
