@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='rubber',
-    version='0.1.5',
+    version='0.1.6',
     description='Elasticsearch client with Django support.',
     author='Stéphane JAIS',
     author_email='stephane@cantinasoftware.com',
