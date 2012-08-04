@@ -44,11 +44,12 @@ You instanciate a rubber.ElasticSearch object for an index_name and a document t
 
 ### The client interface
 
-Once you have such an object, you can GET/PUT/POST/DELETE on the __search_ and __mapping_ endpoints.
-These endpoints are available on the _search_ and _mapping_ properties of the client:
+Once you have such an object, you can GET/PUT/POST/DELETE on the __search_, _count_ and __mapping_ endpoints.
+These endpoints are available on the _search_, _count_ and _mapping_ properties of the client:
 
     client.search
     client.mapping
+    client.count
 
 You can GET/PUT/POST/DELETE on each endpoint like this:
 
@@ -71,6 +72,9 @@ Responses are just like request.models.Response objects returned by the _request
 You can get the corresponding JSON like this:
 
     somedict = response.json
+
+More information is also avalable (see the [requests documentation](http://docs.python-requests.org/en/latest/api/#requests.Response)):
+
     headers = response.headers
     status = response.status_code
 
