@@ -10,7 +10,7 @@ class Resource(object):
 
         if None == base_url:
             try:
-                base_url = settings.ELASTICSEARCH_URL
+                base_url = settings.RUBBER_ELASTICSEARCH_URL
             except AttributeError:
                 pass
 

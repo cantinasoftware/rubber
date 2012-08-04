@@ -32,23 +32,23 @@ class ResourceTest(TestCase):
 
     def test_base_url(self):
         """
-        Tests that base_url defaults to settings['ELASTICSEARCH_URL'] or http://localhost:9200
+        Tests that base_url defaults to settings['RUBBER_ELASTICSEARCH_URL'] or http://localhost:9200
         """
         import rubber
 
-        setattr(rubber.settings, 'ELASTICSEARCH_URL', None)
+        setattr(rubber.settings, 'RUBBER_ELASTICSEARCH_URL', None)
 
         # Check there is a sensible default
         resource = rubber.Resource('/foo')
         self.assertEquals('http://localhost:9200/', resource.base_url)
 
         # Check that django settings are picked up
-        rubber.settings.ELASTICSEARCH_URL = 'https://foo.com/'
+        rubber.settings.RUBBER_ELASTICSEARCH_URL = 'https://foo.com/'
         resource = rubber.Resource('/foo')
         self.assertEquals('https://foo.com/', resource.base_url)
 
         # Check that empty string can be set as base_url
-        rubber.settings.ELASTICSEARCH_URL = ''
+        rubber.settings.RUBBER_ELASTICSEARCH_URL = ''
         resource = rubber.Resource('/foo')
         self.assertEquals('', resource.base_url)
 
@@ -89,7 +89,7 @@ try:
     class ElasticSearchTest(TestCase):
         def setUp(self):
             import rubber
-            setattr(rubber.settings, 'ELASTICSEARCH_URL', 'http://example.com:9200/')
+            setattr(rubber.settings, 'RUBBER_ELASTICSEARCH_URL', 'http://example.com:9200/')
 
             from django.db import models
             from rubber import ElasticSearch

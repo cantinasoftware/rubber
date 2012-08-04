@@ -3,7 +3,7 @@ try:
     from django.conf import settings
 except:
     class _settings:
-        ELASTICSEARCH_URL = None
+        RUBBER_ELASTICSEARCH_URL = None
         RUBBER_DISABLE_AUTO_INDEX = False
         RUBBER_MOCK_HTTP_RESPONSE = None
 
