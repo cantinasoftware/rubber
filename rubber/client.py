@@ -2,6 +2,12 @@ from rubber.resource import Resource
 from rubber.response import Hit, Response
 from rubber import settings
 
+HANDLERS = {
+    'search': '_search',
+    'count': '_count',
+    'mapping': '_mapping'
+}
+
 class ElasticSearch(object):
     def __init__(self, index_name=None, type=None, auto_index=True, hit_class=Hit):
         self.index_name = index_name
@@ -50,12 +56,11 @@ class ElasticSearch(object):
         try:
             return default_impl(name)
         except AttributeError, e:
-            if not name in ('search', 'mapping'):
+            if not name in HANDLERS.keys():
                 raise e
-            if name == 'search':
-                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=self.wrapsearchresponse))
-            else:
-                setattr(self, name, Resource(self.makepath("_%s"%name), wrapper=Response))
+            wrapper = Response
+            if name == 'search': wrapper=self.wrapsearchresponse
+            setattr(self, name, Resource(self.makepath(HANDLERS.get(name)), wrapper=wrapper))
 
             return default_impl(name)
 

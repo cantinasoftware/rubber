@@ -10,17 +10,7 @@ from rubber import Resource
 
 import requests
 from requests.compat import json
-
-class ResponseMock(requests.models.Response):
-    def __init__(self):
-        super(ResponseMock, self).__init__()
-        from StringIO import StringIO
-
-        self.raw = StringIO(ResponseMock._content)
-        self.status_code = 200
-
-    _content = '{}'
-
+from rubber.testutils import ResponseMock
 
 class RequestMock(object):
     def __init__(self):
@@ -108,6 +98,7 @@ try:
                 elasticsearch = ElasticSearch(auto_index=True)
 
             self.Article = Article
+            rubber.settings.RUBBER_MOCK_HTTP_RESPONSE = None
 
         def test_contribute_to_class(self):
             """
@@ -190,9 +181,9 @@ try:
             Check that a Response object is returned
             """
 
-            ResponseMock._content = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
+            from rubber import settings, resource
+            settings.RUBBER_MOCK_HTTP_RESPONSE = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
 
-            from rubber import resource
             requestmock = RequestMock()
             resource.requests = requestmock
 
@@ -213,8 +204,9 @@ try:
 
             self.Article.elasticsearch.hit_class = MyHit
 
-            ResponseMock._content = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
-            from rubber import resource
+            from rubber import settings, resource
+            settings.RUBBER_MOCK_HTTP_RESPONSE = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
+            
             requestmock = RequestMock()
             resource.requests = requestmock
 
@@ -270,8 +262,9 @@ class HitTest(TestCase):
 class ResponseTest(TestCase):
     def setUp(self):
         # Setup a mock response
-        ResponseMock._content = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
-        from rubber import resource
+        from rubber import settings, resource
+        settings.RUBBER_MOCK_HTTP_RESPONSE = """{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":2,"max_score":1.0,"hits":[{"_index":"auth","_type":"user","_id":"6","_score":1.0, "_source" : {"username": "guillaume", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T08:30:11", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$M1nRKJfbvdQf$ouX5u9FOUF/MKhhwuwYbiuoVidFITsBrEstGBB4mzZA=", "email": "somemail@test.com", "date_joined": "2012-08-02T08:30:11"}},{"_index":"auth","_type":"user","_id":"8","_score":1.0, "_source" : {"username": "stephane", "first_name": "", "last_name": "", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2012-08-02T09:14:38", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$ORDHZAnNqTwF$UGmkUCyH0/uh1ruP93ZSTyog9Wi5g2qc+m/fxowigFs=", "email": "othermail@test.com", "date_joined": "2012-08-02T09:14:38"}}]}}"""
+            
         requestmock = RequestMock()
         resource.requests = requestmock
 
@@ -304,6 +297,8 @@ class ResponseTest(TestCase):
 
 
         # with invalid json
-        ResponseMock._content = """;;;"""
+        from rubber import settings
+        settings.RUBBER_MOCK_HTTP_RESPONSE = """;;;"""
+            
         response = self.client.search()
         self.assertIsNone(response.json)
