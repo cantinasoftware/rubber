@@ -24,7 +24,7 @@ class Resource(object):
         return response
 
     def request(self, method, data=None, **kwargs):
-        if settings.RUBBER_MOCK_HTTP_RESPONSE:
+        if getattr(settings, 'RUBBER_MOCK_HTTP_RESPONSE', False):
             return self.wrapper(ResponseMock(settings.RUBBER_MOCK_HTTP_RESPONSE))
         path = self.base_url + self.path
         try:
