@@ -3,11 +3,18 @@ class Hit(object):
         self.attributes = {}
         for key, val in dict_response.items():
             if isinstance(val, dict):
-                self.attributes[key] = Hit(val)
+                self.attributes[key] = self._hit_or_val(val)
             elif isinstance(val, list):
-                self.attributes[key] = [Hit(o) for o in val]
+                self.attributes[key] = [self._hit_or_val(o) for o in val]
             else:
                 self.attributes[key] = val
+
+    def _hit_or_val(self, val):
+        if isinstance(val, dict):
+            return Hit(val)
+        elif isinstance(val, list):
+            return Hit(val)
+        return val
 
     def __getattribute__(self, name):
         default_impl = super(Hit, self).__getattribute__
