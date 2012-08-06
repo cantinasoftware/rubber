@@ -15,17 +15,10 @@ from rubber.testutils import ResponseMock
 class RequestMock(object):
     def __init__(self):
         self.stack = []
-    def get(self, url, **kwargs):
-        self.stack.append({'method': 'get', 'url':url, 'kwargs': kwargs})
+    def request(self, method, url, **kwargs):
+        self.stack.append({'method': method, 'url':url, 'kwargs': kwargs})
         return ResponseMock()
 
-    def put(self, url, **kwargs):
-        self.stack.append({'method': 'put', 'url':url, 'kwargs': kwargs})
-        return ResponseMock()
-
-    def post(self, url, **kwargs):
-        self.stack.append({'method': 'post', 'url':url, 'kwargs': kwargs})
-        return ResponseMock()
 
 
 class ResourceTest(TestCase):
@@ -121,7 +114,7 @@ try:
 
             self.assertEquals(1, len(requestmock.stack))
             self.assertEquals('http://example.com:9200/tests/article/_search', requestmock.stack[0]['url'])
-            self.assertEquals('get', requestmock.stack[0]['method'])
+            self.assertEquals('GET', requestmock.stack[0]['method'])
             self.assertEquals('titi', requestmock.stack[0]['kwargs']['toto'])
             from rubber.instanceutils import data_to_json
             self.assertEquals(data_to_json(q), requestmock.stack[0]['kwargs']['data'])
@@ -130,7 +123,7 @@ try:
 
             self.assertEquals(2, len(requestmock.stack))
             self.assertEquals('http://example.com:9200/tests/article/_mapping', requestmock.stack[1]['url'])
-            self.assertEquals('put', requestmock.stack[1]['method'])
+            self.assertEquals('PUT', requestmock.stack[1]['method'])
             self.assertEquals('titi', requestmock.stack[1]['kwargs']['toto'])
 
         def test_auto_index(self):
@@ -167,13 +160,13 @@ try:
             # Check that put() passes the article instance as data
             article.elasticsearch.put()
             self.assertEquals(1, len(requestmock.stack))
-            self.assertEquals("put", requestmock.stack[0]['method'])
+            self.assertEquals("PUT", requestmock.stack[0]['method'])
             self.assertEquals('{}', requestmock.stack[0]['kwargs']['data'])
 
             # Check that post() passes the article instance as data
             article.elasticsearch.post()
             self.assertEquals(2, len(requestmock.stack))
-            self.assertEquals("post", requestmock.stack[1]['method'])
+            self.assertEquals("POST", requestmock.stack[1]['method'])
             self.assertEquals('{}', requestmock.stack[1]['kwargs']['data'])
 
         def test_response(self):

@@ -9,11 +9,12 @@ HANDLERS = {
 }
 
 class ElasticSearch(object):
-    def __init__(self, index_name=None, type=None, auto_index=True, hit_class=Hit):
+    def __init__(self, index_name=None, type=None, auto_index=True, hit_class=Hit, raise_on_error=False):
         self.index_name = index_name
         self.type = type
         self.auto_index = auto_index
         self.hit_class = hit_class
+        self.raise_on_error = raise_on_error
 
     def contribute_to_class(self, model, name):
         if not self.index_name:
@@ -35,13 +36,13 @@ class ElasticSearch(object):
         setattr(model, name, ElasticSearchDescriptor(self))
 
     def get(self, pk):
-        return Resource(self.makepath(pk), wrapper=Response).get()
+        return Resource(self.makepath(pk), wrapper=Response, raise_on_error=self.raise_on_error).get()
 
     def put(self, pk, instance):
-        return Resource(self.makepath(pk), wrapper=Response).put(data=instance)
+        return Resource(self.makepath(pk), wrapper=Response, raise_on_error=self.raise_on_error).put(data=instance)
 
     def delete(self, pk):
-        return Resource(self.makepath(pk), wrapper=Response).delete()
+        return Resource(self.makepath(pk), wrapper=Response, raise_on_error=self.raise_on_error).delete()
 
     def django_post_delete(self, sender, instance, **kwargs):
         from rubber.instanceutils import get_pk
@@ -60,7 +61,7 @@ class ElasticSearch(object):
                 raise e
             wrapper = Response
             if name == 'search': wrapper=self.wrapsearchresponse
-            setattr(self, name, Resource(self.makepath(HANDLERS.get(name)), wrapper=wrapper))
+            setattr(self, name, Resource(self.makepath(HANDLERS.get(name)), wrapper=wrapper, raise_on_error=self.raise_on_error))
 
             return default_impl(name)
 
@@ -87,5 +88,8 @@ class ElasticSearchDescriptor(object):
         if instance != None:
             from rubber.resource import InstanceResource
             from rubber.instanceutils import get_pk
-            return InstanceResource(instance, self.elasticsearch.makepath(get_pk(instance)), wrapper=self.elasticsearch.wrapsearchresponse)
+            return InstanceResource(instance,
+                                    self.elasticsearch.makepath(get_pk(instance)),
+                                    wrapper=self.elasticsearch.wrapsearchresponse,
+                                    raise_on_error=self.elasticsearch.raise_on_error)
         return self.elasticsearch

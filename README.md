@@ -96,9 +96,18 @@ As a convenience, they also allow you to get '_' properties without the uderscor
 
 ### Advanced configuration
 
+#### HTTP configuration
+
 Since rubber is based on the [requests library](http://python-requests.org), 
 you can configure every aspect of the HTTP request/response cycle directly
 through [_requests_ configuration options](http://docs.python-requests.org/en/latest/user/advanced/#configuring-requests).
+
+#### Error behavior
+
+By default, any error calling elasticsearch will yield a None response and log the exception.
+This can be changed when instanciating a rubber.ElasticSearch:
+
+    es = rubber.ElasticSearch(raise_on_error=True)
 
 ### Unit testing
 
